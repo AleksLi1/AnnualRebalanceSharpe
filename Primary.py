@@ -80,7 +80,7 @@ for k, v in training_date_range:
     cleaned_weights = dict(cleaned_weights)
     weights = weights.append(dict(cleaned_weights), ignore_index=True)
 
-    # Get allocation in shares 
+    # Get allocation in shares
     latest_prices = get_latest_prices(prices_dataframe)
     da = DiscreteAllocation(cleaned_weights, latest_prices, total_portfolio_value=portfolio_value)
     allocation, leftover = da.lp_portfolio()
@@ -159,10 +159,12 @@ plt.show()
 
 # Calculate portfolio statistics
 # Calculate max drawdown
+daily_weights_returns.index = daily_trading_days_modified
 rolling_max = daily_weights_returns['Portfolio Value'].rolling(252, min_periods=1).max()
 daily_drawdown = daily_weights_returns['Portfolio Value']/rolling_max - 1.0
 max_daily_drawdown = daily_drawdown.rolling(252, min_periods=1).min()
 daily_drawdown.plot()
+plt.xticks(rotation=45)
 plt.title('Portfolio Max Drawdown')
 plt.show()
 print('Max portfolio drawdown: {:.2%}'.format(round((daily_drawdown.min()), 2)))
