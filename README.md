@@ -12,7 +12,7 @@ Portfolio performance:
 
 Drawdown stats:
 
-![drawdown](https://i.ibb.co/Qb02Kdg/Figure-2.png)
+![drawdown](https://i.ibb.co/v19xvz2/Figure-2.png)
 
 Returns distribution:
 
