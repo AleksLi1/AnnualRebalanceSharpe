@@ -1,6 +1,8 @@
-# Annual Rebalance for Max Sharpe
+# Annually Rebalanced Max Sharpe Efficient Frontier
 
-This is a script that annually rebalances a portfolio of five ETFs to maximise for their Sharpe ratio. This is still a work in progress and there are a couple of improvements that I would like to do. I've also tried my best to document my code where possible, so feel free to play around with it and see if there are any improvements that you would suggest. 
+This model calculates an efficient frontier of 5 ETF's on an annual basis and selects the portfolio with the highest Sharpe ratio.
+This is still a work in progress and there are a couple of improvements that I would like to do. I've also tried my best
+to document my code where possible, so feel free to play around with it and see if there are any improvements that you would suggest. 
 
 Here are the model results:
 
