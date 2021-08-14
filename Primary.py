@@ -6,7 +6,7 @@ import pandas_market_calendars as mcal
 import matplotlib.pyplot as plt
 from pypfopt import (EfficientFrontier, objective_functions, expected_returns, DiscreteAllocation, get_latest_prices)
 from datetime import datetime
-from Functions import annual_cov, start_date, start_of_month
+from Functions import annual_cov, start_date
 from scipy.stats import skew, kurtosis
 
 # Ignore warnings
