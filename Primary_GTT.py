@@ -32,6 +32,25 @@ annual_ret = daily_ret.groupby(pd.Grouper(freq='Y')).apply(np.sum)
 prices_benchmark = yf.download(tickers=benchmark, start=start, end=end)['Adj Close']
 prices_benchmark_daily_ret = np.log(prices_benchmark / prices_benchmark.shift(1))[1:]
 
+# FRED data
+UNRATE = pd.read_csv('UNRATE.csv', index_col=0).dropna()  # Unemployment Rate
+month_start = []
+month_end = pd.date_range(start, end, freq='M').strftime('%Y-%m-%d').tolist()
+for x in month_end:
+    month_start.append(start_of_month(x))
+signal_date_range = list(zip(month_start, month_end))
+signal_trading_month_start = []
+signal_trading_month_end = []
+nyse = mcal.get_calendar('NYSE')
+for k, v in signal_date_range:
+    signal_nyse_trading_date_range = nyse.schedule(k, v)
+    signal_nyse_trading_date_range_index = mcal.date_range(signal_nyse_trading_date_range, frequency='1D') \
+        .strftime('%Y-%m-%d') \
+        .tolist()
+    signal_trading_month_start.append(signal_nyse_trading_date_range_index[0])
+    signal_trading_month_end.append(signal_nyse_trading_date_range_index[-1])
+UNRATE = UNRATE.loc[start:start_of_month(end), :]
+
 # Create list of trading days between start date and end date of training set
 # Earliest and latest date of a year
 start_years = []
@@ -108,8 +127,45 @@ daily_ret.index = daily_trading_days_modified
 daily_weights_returns = daily_weights.mul(daily_ret).dropna()
 daily_weights_returns.columns = daily_ret_col
 
+# Calculate indicators
+# Unemployment GTT Model
+signal = pd.DataFrame()
+UNRATE['UnemploymentMA'] = UNRATE['UNRATE'].rolling(12).mean()
+signal['UnemploymentMA'] = np.where(UNRATE['UNRATE'] >= UNRATE['UnemploymentMA'], 1, 0)
+signal.index = signal_trading_month_start
+
+# Price indicators
+prices['210MA'] = prices['SPY'].rolling(210).mean()
+prices['indicator1'] = np.where(prices['SPY'] >= prices['210MA'], 1, 0)
+prices_index = prices.index.to_list()
+prices_index_dataset = []
+for idx, val in enumerate(prices_index):
+    for x in signal_trading_month_start:
+        if val.strftime('%Y-%m-%d') == x:
+            prices_index_dataset.append(prices.iloc[[idx], [-1]])
+result = np.reshape(prices_index_dataset, (np.shape(prices_index_dataset)[0], np.shape(prices_index_dataset)[1]))
+result_df = pd.DataFrame(result, columns=['indicator1'])
+result_df.index = signal_trading_month_start
+final_df = pd.concat([signal, result_df], axis=1)
+
+# Signals for the Unemployment GTT Model
+conditions_signal3 = [(final_df['UnemploymentMA'] == 1) & (final_df['indicator1'] == 1)]
+conditions_signal4 = [(final_df['UnemploymentMA'] == 1) & (final_df['indicator1'] == 0)]
+final_df['signal_unemployment'] = np.select(conditions_signal3, ['True'])
+final_df['signal_unemployment'] = np.select(conditions_signal4, ['False'])
+final_df['signal_unemployment'] = np.where(final_df['UnemploymentMA'] == 0, 'True', 'False')
+
+# Signals dataset: final touches
+signal_nyse_trading_date_range = nyse.schedule(signal_trading_month_start[0], signal_trading_month_end[-1])
+signal_nyse_trading_date_range_index = mcal.date_range(signal_nyse_trading_date_range, frequency='1D') \
+    .strftime('%Y-%m-%d') \
+    .tolist()
+final_df = final_df.reindex(signal_nyse_trading_date_range_index, method='ffill')
+
 # Create total returns and portfolio value columns
+daily_weights_returns['signal'] = final_df['signal_unemployment']
 daily_weights_returns['Daily Pct Return'] = daily_weights_returns.sum(axis=1)+1
+daily_weights_returns['Daily Pct Return'] = np.where(daily_weights_returns['signal'] == 'False', 1, daily_weights_returns['Daily Pct Return'])
 daily_weights_returns = daily_weights_returns.reset_index(drop=False)
 daily_weights_returns['Portfolio Value'] = np.nan
 daily_weights_returns.at[0, 'Portfolio Value'] = portfolio_value
