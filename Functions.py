@@ -14,9 +14,9 @@ def annual_cov(period, my_date, my_data, tickers):
     :return: returns a covariance matrix dataframe
     """
 
-    covariance_matrix = pd.DataFrame(np.random.randn(366*period, len(tickers)),
-                                     index=pd.date_range(my_date, periods=366*period),
-                                     columns=list(my_data)).rolling(366*period).cov().dropna().droplevel(0, axis=0)
+    covariance_matrix = pd.DataFrame(np.random.randn(252*period, len(tickers)),
+                                     index=pd.date_range(my_date, periods=252*period),
+                                     columns=list(my_data)).rolling(252*period).cov().dropna().droplevel(0, axis=0)
     return covariance_matrix
 
 
