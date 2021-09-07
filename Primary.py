@@ -19,7 +19,7 @@ benchmark = ['SPY']
 start = '2005-01-01'
 end = '2020-12-31'
 training_years = 1  # Number of years for which we calculate the expected return and covariance data
-portfolio_value = 5000  # Amount in dollars for initial portfolio value
+portfolio_value = 13733  # Amount in dollars for initial portfolio value
 
 # Get and process data
 # Ticker data
@@ -73,7 +73,6 @@ for k, v in training_date_range:
 
     # Optimise portfolio and give weights
     raw_weights = ef.max_sharpe()
-    ef.add_objective(objective_functions.L2_reg, gamma=1)  # Objective to discourage zero-weights
     cleaned_weights = ef.clean_weights()
 
     # Append weights to dataframe 'weights'
@@ -99,7 +98,7 @@ daily_trading_days = mcal.date_range(nyse.schedule(start, end), frequency='1D')\
         .tolist()
 daily_weights = pd.DataFrame(np.repeat(weights.values, 252, axis=0))
 daily_weights.columns = weights.columns
-daily_weights.drop(daily_weights.tail(4).index, inplace=True)  # Temporary solution, dropping extra 4 rows from df
+daily_weights.drop(daily_weights.tail(4).index, inplace=True)  # Temporary solution, dropping extra 4 rows from df. Might have something to do with leap years.
 daily_weights.index = daily_trading_days
 
 # Calculate weighted stock returns

@@ -13,7 +13,7 @@ def annual_cov(period, my_date, my_data, tickers):
     :param tickers: list of tickers
     :return: returns a covariance matrix dataframe
     """
-
+    np.random.seed(42)
     covariance_matrix = pd.DataFrame(np.random.randn(252*period, len(tickers)),
                                      index=pd.date_range(my_date, periods=252*period),
                                      columns=list(my_data)).rolling(252*period).cov().dropna().droplevel(0, axis=0)
