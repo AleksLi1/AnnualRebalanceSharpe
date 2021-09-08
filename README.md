@@ -6,7 +6,7 @@ to document my code where possible, so feel free to play around with it and see 
 
 Here are the model results:
 
-![stats](https://i.ibb.co/mvc6Gn7/3.png)
+![stats](https://i.ibb.co/N3PrKCf/image.png)
 
 ![Performance](https://i.ibb.co/59FgBw1/1.png)
 
