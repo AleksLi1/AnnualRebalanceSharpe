@@ -92,7 +92,6 @@ for k, v in training_date_range:
 
     # Optimise portfolio and give weights
     raw_weights = ef.max_sharpe()
-    ef.add_objective(objective_functions.L2_reg, gamma=1)  # Objective to discourage zero-weights
     cleaned_weights = ef.clean_weights()
 
     # Append weights to dataframe 'weights'
@@ -227,8 +226,11 @@ print('Max portfolio drawdown: {:.2%}'.format(round((daily_drawdown.min()), 2)))
 # Calculate portfolio return statistics
 # Annual portfolio returns
 daily_weights_returns['Daily Pct Return'] = daily_weights_returns['Daily Pct Return']-1
+daily_weights_returns = daily_weights_returns.reset_index(drop=True)
+daily_weights_returns['index'] = pd.to_datetime(daily_weights_returns['index'])
 daily_weights_returns.set_index('index', inplace=True)
-portfolio_annual_return = daily_weights_returns['Daily Pct Return'].rolling(252).sum().mean()
+portfolio_annual_return = daily_weights_returns['Daily Pct Return']\
+    .groupby(pd.Grouper(freq='Y')).apply(np.sum).mean()
 print('Average annual portfolio return: {:.2%}'.format(portfolio_annual_return))
 
 # Portfolio Sharpe

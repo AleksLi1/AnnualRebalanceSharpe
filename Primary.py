@@ -19,7 +19,7 @@ benchmark = ['SPY']
 start = '2005-01-01'
 end = '2020-12-31'
 training_years = 1  # Number of years for which we calculate the expected return and covariance data
-portfolio_value = 13733  # Amount in dollars for initial portfolio value
+portfolio_value = 5000  # Amount in dollars for initial portfolio value
 
 # Get and process data
 # Ticker data
@@ -170,8 +170,11 @@ print('Max portfolio drawdown: {:.2%}'.format(round((daily_drawdown.min()), 2)))
 # Calculate portfolio return statistics
 # Annual portfolio returns
 daily_weights_returns['Daily Pct Return'] = daily_weights_returns['Daily Pct Return']-1
+daily_weights_returns = daily_weights_returns.reset_index(drop=True)
+daily_weights_returns['index'] = pd.to_datetime(daily_weights_returns['index'])
 daily_weights_returns.set_index('index', inplace=True)
-portfolio_annual_return = daily_weights_returns['Daily Pct Return'].rolling(252).sum().mean()
+portfolio_annual_return = daily_weights_returns['Daily Pct Return']\
+    .groupby(pd.Grouper(freq='Y')).apply(np.sum).mean()
 print('Average annual portfolio return: {:.2%}'.format(portfolio_annual_return))
 
 # Portfolio Sharpe
