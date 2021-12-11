@@ -1,7 +1,6 @@
 import pandas as pd
 import warnings
 import numpy as np
-import yfinance as yf
 import pandas_market_calendars as mcal
 import matplotlib.pyplot as plt
 from pypfopt import (EfficientFrontier, objective_functions, expected_returns, DiscreteAllocation, get_latest_prices)
