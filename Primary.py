@@ -90,9 +90,6 @@ for k, v in training_date_range:
     allocation, leftover = da.lp_portfolio()
     allocation_shares = allocation_shares.append(dict(allocation), ignore_index=True).set_index(weights.index)
 
-# Get data for post-execution analysis
-weights.to_csv('weights.csv')
-
 # Clean up weights dataframe
 trading_start_years = []
 for x in trading_start_dates:
