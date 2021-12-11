@@ -57,7 +57,7 @@ def start_date_six(my_date):
     """
 
     my_date = datetime.strptime(my_date, '%Y-%m-%d')
-    starting_date = date(my_date.year, 6, 1)
+    starting_date = date(my_date.year, 6, 30)
     starting_date = starting_date.strftime('%Y-%m-%d')
     return starting_date
 
