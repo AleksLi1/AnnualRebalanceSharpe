@@ -23,17 +23,18 @@ portfolio_value = 5000  # Amount in dollars for initial portfolio value
 
 # Get and process data
 # Ticker data
-prices = yf.download(tickers=tickers, start=start, end=end)['Adj Close']
+prices = pd.read_csv('data/price_data.csv', index_col=0).dropna()
+prices.index = pd.to_datetime(prices.index)
 daily_ret = np.log(prices / prices.shift(1))[1:]
 daily_ret_col = list(daily_ret.columns)
 annual_ret = daily_ret.groupby(pd.Grouper(freq='Y')).apply(np.sum)
 
 # Benchmark data
-prices_benchmark = yf.download(tickers=benchmark, start=start, end=end)['Adj Close']
+prices_benchmark = prices[benchmark]
 prices_benchmark_daily_ret = np.log(prices_benchmark / prices_benchmark.shift(1))[1:]
 
 # FRED data
-UNRATE = pd.read_csv('UNRATE.csv', index_col=0).dropna()  # Unemployment Rate
+UNRATE = pd.read_csv('data/UNRATE.csv', index_col=0).dropna()  # Unemployment Rate
 month_start = []
 month_end = pd.date_range(start, end, freq='M').strftime('%Y-%m-%d').tolist()
 for x in month_end:

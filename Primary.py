@@ -1,10 +1,9 @@
 import pandas as pd
 import warnings
 import numpy as np
-import yfinance as yf
 import pandas_market_calendars as mcal
 import matplotlib.pyplot as plt
-from pypfopt import (EfficientFrontier, expected_returns, DiscreteAllocation, get_latest_prices)
+from pypfopt import (EfficientFrontier, expected_returns, DiscreteAllocation, get_latest_prices, objective_functions)
 from datetime import datetime
 from Functions import annual_cov, start_date
 from scipy.stats import skew, kurtosis
@@ -23,13 +22,14 @@ portfolio_value = 5000  # Amount in dollars for initial portfolio value
 
 # Get and process data
 # Ticker data
-prices = yf.download(tickers=tickers, start=start, end=end)['Adj Close']
+prices = pd.read_csv('data/price_data.csv', index_col=0).dropna()
+prices.index = pd.to_datetime(prices.index)
 daily_ret = np.log(prices / prices.shift(1))[1:]
 daily_ret_col = list(daily_ret.columns)
 annual_ret = daily_ret.groupby(pd.Grouper(freq='Y')).apply(np.sum)
 
 # Benchmark data
-prices_benchmark = yf.download(tickers=benchmark, start=start, end=end)['Adj Close']
+prices_benchmark = prices[benchmark]
 prices_benchmark_daily_ret = np.log(prices_benchmark / prices_benchmark.shift(1))[1:]
 
 # Create list of trading days between start date and end date of training set
@@ -72,7 +72,12 @@ for k, v in training_date_range:
     ef = EfficientFrontier(prices_expected_returns, covariance_matrix)
 
     # Optimise portfolio and give weights
-    raw_weights = ef.max_sharpe()
+    # Making the problem into a nonconvex objective because pypfopt changed their backend to a convex optimiser
+    raw_weights = ef.nonconvex_objective(
+        objective_functions.sharpe_ratio,
+        objective_args=(ef.expected_returns, ef.cov_matrix),
+        weights_sum_to_one=True,
+    )
     cleaned_weights = ef.clean_weights()
 
     # Append weights to dataframe 'weights'
@@ -84,6 +89,9 @@ for k, v in training_date_range:
     da = DiscreteAllocation(cleaned_weights, latest_prices, total_portfolio_value=portfolio_value)
     allocation, leftover = da.lp_portfolio()
     allocation_shares = allocation_shares.append(dict(allocation), ignore_index=True).set_index(weights.index)
+
+# Get data for post-execution analysis
+weights.to_csv('weights.csv')
 
 # Clean up weights dataframe
 trading_start_years = []
@@ -102,7 +110,7 @@ daily_weights.drop(daily_weights.tail(4).index, inplace=True)  # Temporary solut
 daily_weights.index = daily_trading_days
 
 # Calculate weighted stock returns
-daily_trading_days_modified = daily_trading_days[:-1]  # Temporary solution, dropping extra 1 item from list
+daily_trading_days_modified = daily_trading_days[1:]  # dropping first date, which was used for calculations
 daily_ret.index = daily_trading_days_modified
 daily_weights_returns = daily_weights.mul(daily_ret).dropna()
 daily_weights_returns.columns = daily_ret_col
@@ -120,7 +128,7 @@ for i, row in daily_weights_returns.iterrows():  # Loop by iterrows: fight me (o
                                                 daily_weights_returns.loc[i - 1, 'Portfolio Value']
 
 # Process benchmark data
-prices_benchmark_daily_ret = prices_benchmark_daily_ret.to_frame().reset_index(drop=False)
+prices_benchmark_daily_ret = prices_benchmark_daily_ret.reset_index(drop=False)
 prices_benchmark_daily_ret['Portfolio Value'] = np.nan
 prices_benchmark_daily_ret.loc[[0], ['Portfolio Value']] = portfolio_value
 prices_benchmark_daily_ret.rename(columns={prices_benchmark_daily_ret.columns[0]: 'Daily Pct Return'}, inplace=True)
