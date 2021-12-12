@@ -24,7 +24,7 @@ portfolio_value = 5000  # Amount in dollars for initial portfolio value
 
 # Get and process data
 # Ticker data
-prices = pd.read_csv('data/price_data.csv', index_col=0).dropna()
+prices = pd.read_csv('data/price_data_6mo.csv', index_col=0).dropna()
 prices.index = pd.to_datetime(prices.index)
 daily_ret = np.log(prices / prices.shift(1))[1:]
 daily_ret_col = list(daily_ret.columns)

@@ -22,7 +22,7 @@ portfolio_value = 5000  # Amount in dollars for initial portfolio value
 
 # Get and process data
 # Ticker data
-prices = pd.read_csv('data/price_data.csv', index_col=0).dropna()
+prices = pd.read_csv('data/price_data_GTT.csv', index_col=0).dropna()
 prices.index = pd.to_datetime(prices.index)
 daily_ret = np.log(prices / prices.shift(1))[1:]
 daily_ret_col = list(daily_ret.columns)
@@ -176,7 +176,7 @@ for i, row in daily_weights_returns.iterrows():  # Loop by iterrows: fight me (o
                                                 daily_weights_returns.loc[i - 1, 'Portfolio Value']
 
 # Process benchmark data
-prices_benchmark_daily_ret = prices_benchmark_daily_ret.to_frame().reset_index(drop=False)
+prices_benchmark_daily_ret = prices_benchmark_daily_ret.reset_index(drop=False)
 prices_benchmark_daily_ret['Portfolio Value'] = np.nan
 prices_benchmark_daily_ret.loc[[0], ['Portfolio Value']] = portfolio_value
 prices_benchmark_daily_ret.rename(columns={prices_benchmark_daily_ret.columns[0]: 'Daily Pct Return'}, inplace=True)
