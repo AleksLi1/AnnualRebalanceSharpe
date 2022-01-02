@@ -53,7 +53,7 @@ del mid_dates[0]
 del Q3_dates[0]
 del end_dates[0]
 
-training_date_range = list(zip(start_dates, Q2_dates, mid_dates, Q3_dates,end_dates))
+training_date_range = list(zip(start_dates, Q2_dates, mid_dates, Q3_dates, end_dates))
 # Get NYSE trading calendar
 nyse = mcal.get_calendar('NYSE')
 
@@ -118,26 +118,22 @@ for v, w, x, y, z in training_date_range:
 
     # Calculate efficient frontier with given covariance matrix and expected returns for Q2
     prices_expected_returns_Q2 = expected_returns.ema_historical_return(prices_dataframe_Q2)
-    covariance_matrix_Q2 = quarterly_cov(nyse_trading_date_range_index_Q2[0],
-                                           prices_expected_returns_Q2, tickers)
+    covariance_matrix_Q2 = quarterly_cov(nyse_trading_date_range_index_Q2[0], prices_expected_returns_Q2, tickers)
     ef_Q2 = EfficientFrontier(prices_expected_returns_Q2, covariance_matrix_Q2)
 
     # Calculate efficient frontier with given covariance matrix and expected returns for H1
     prices_expected_returns_H1 = expected_returns.ema_historical_return(prices_dataframe_H1)
-    covariance_matrix_H1 = quarterly_cov(nyse_trading_date_range_index_H1[0],
-                                           prices_expected_returns_H1, tickers)
+    covariance_matrix_H1 = quarterly_cov(nyse_trading_date_range_index_H1[0], prices_expected_returns_H1, tickers)
     ef_H1 = EfficientFrontier(prices_expected_returns_H1, covariance_matrix_H1)
 
     # Calculate efficient frontier with given covariance matrix and expected returns for Q3
     prices_expected_returns_Q3 = expected_returns.ema_historical_return(prices_dataframe_Q3)
-    covariance_matrix_Q3 = quarterly_cov(nyse_trading_date_range_index_Q3[0],
-                                           prices_expected_returns_Q3, tickers)
+    covariance_matrix_Q3 = quarterly_cov(nyse_trading_date_range_index_Q3[0], prices_expected_returns_Q3, tickers)
     ef_Q3 = EfficientFrontier(prices_expected_returns_Q3, covariance_matrix_Q3)
 
     # Calculate efficient frontier with given covariance matrix and expected returns for H2
     prices_expected_returns_H2 = expected_returns.ema_historical_return(prices_dataframe_H2)
-    covariance_matrix_H2 = quarterly_cov(nyse_trading_date_range_index_H2[0],
-                                           prices_expected_returns_H1, tickers)
+    covariance_matrix_H2 = quarterly_cov(nyse_trading_date_range_index_H2[0], prices_expected_returns_H1, tickers)
     ef_H2 = EfficientFrontier(prices_expected_returns_H2, covariance_matrix_H2)
 
     # Optimise portfolio and give weights for Q2

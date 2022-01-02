@@ -61,6 +61,7 @@ def start_date_six(my_date):
     starting_date = starting_date.strftime('%Y-%m-%d')
     return starting_date
 
+
 def start_date_Q2(my_date):
 
     """
@@ -74,6 +75,7 @@ def start_date_Q2(my_date):
     starting_date = starting_date.strftime('%Y-%m-%d')
     return starting_date
 
+
 def start_date_Q3(my_date):
 
     """
@@ -86,6 +88,7 @@ def start_date_Q3(my_date):
     starting_date = date(my_date.year, 9, 30)
     starting_date = starting_date.strftime('%Y-%m-%d')
     return starting_date
+
 
 def semi_annual_cov(my_date, my_data, tickers):
 
@@ -101,6 +104,7 @@ def semi_annual_cov(my_date, my_data, tickers):
                                      index=pd.date_range(my_date, periods=126),
                                      columns=list(my_data)).rolling(126).cov().dropna().droplevel(0, axis=0)
     return covariance_matrix
+
 
 def quarterly_cov(my_date, my_data, tickers):
 

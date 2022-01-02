@@ -164,7 +164,8 @@ final_df = final_df.reindex(signal_nyse_trading_date_range_index, method='ffill'
 # Create total returns and portfolio value columns
 daily_weights_returns['signal'] = final_df['signal_unemployment']
 daily_weights_returns['Daily Pct Return'] = daily_weights_returns.sum(axis=1)+1
-daily_weights_returns['Daily Pct Return'] = np.where(daily_weights_returns['signal'] == 'False', 1, daily_weights_returns['Daily Pct Return'])
+daily_weights_returns['Daily Pct Return'] = np.where(daily_weights_returns['signal'] == 'False', 1,
+                                                     daily_weights_returns['Daily Pct Return'])
 daily_weights_returns = daily_weights_returns.reset_index(drop=False)
 daily_weights_returns['Portfolio Value'] = np.nan
 daily_weights_returns.at[0, 'Portfolio Value'] = portfolio_value
