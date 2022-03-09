@@ -106,17 +106,18 @@ def semi_annual_cov(my_date, my_data, tickers):
     return covariance_matrix
 
 
-def quarterly_cov(my_date, my_data, tickers):
+def quarterly_cov(my_date, my_data, tickers, length):
 
     """
     Calculates a covariance matrix given the following parameters:
     :param my_date: first day of the trading year, str
     :param my_data: dataframe of prices and dates
     :param tickers: list of tickers
+    :param length: length of dataset
     :return: returns a covariance matrix dataframe
     """
     np.random.seed(42)
-    covariance_matrix = pd.DataFrame(np.random.randn(63, len(tickers)),
-                                     index=pd.date_range(my_date, periods=63),
-                                     columns=list(my_data)).rolling(63).cov().dropna().droplevel(0, axis=0)
+    covariance_matrix = pd.DataFrame(np.random.randn(length, len(tickers)),
+                                     index=pd.date_range(my_date, periods=length),
+                                     columns=list(my_data)).rolling(length).cov().dropna().droplevel(0, axis=0)
     return covariance_matrix
